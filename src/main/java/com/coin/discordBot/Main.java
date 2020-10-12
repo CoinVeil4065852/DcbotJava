@@ -1,0 +1,50 @@
+package com.coin.discordBot;
+
+import net.dv8tion.jda.api.AccountType;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
+
+import javax.security.auth.login.LoginException;
+import javax.swing.*;
+import java.util.jar.JarEntry;
+
+public class Main {
+    public static JDA jda;
+    public static void main (String[] agrs) throws LoginException {
+        //
+        JPanel jPanel = new JPanel();
+        JFrame jFrame = new JFrame();
+
+        jFrame.setSize(800,600);
+        jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        jFrame.setVisible(true);
+        jFrame.add(jPanel);
+        jFrame.setTitle("Coin's DCBot");
+
+        jPanel.setLayout(null);
+
+        JLabel jLabel = new JLabel();
+        jLabel.setBounds(10,20,80,25);
+        jPanel.add(jLabel);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //
+        jda = new JDABuilder(AccountType.BOT).setToken("NzQxOTE1NjM0OTA4MjY2NTI2.Xy-gxw.4cPdIA8OZyGaeh-6Cnr9ODkzJdI").setActivity(Activity.playing("Cooking Lo Mei......")).build();
+        jda.addEventListener(new Events());
+    }
+}
