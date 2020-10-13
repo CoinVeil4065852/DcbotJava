@@ -7,11 +7,14 @@ import net.dv8tion.jda.api.entities.Activity;
 
 import javax.security.auth.login.LoginException;
 import javax.swing.*;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.jar.JarEntry;
 
 public class Main {
     public static JDA jda;
-    public static void main (String[] agrs) throws LoginException {
+    public static void main (String[] agrs) throws LoginException, UnsupportedEncodingException {
         //
         JPanel jPanel = new JPanel();
         JFrame jFrame = new JFrame();
@@ -29,6 +32,15 @@ public class Main {
         jPanel.add(jLabel);
 
 
+        System.out.println();
+        String[] ws= "你好我是中文".split("");
+        System.out.println(ws.toString());
+        String ww = "";
+        for (String w : ws){
+             ww=ww+w;
+            System.out.println(w);
+        }
+        System.out.println(ww);
 
 
 
@@ -46,5 +58,11 @@ public class Main {
         //
         jda = new JDABuilder(AccountType.BOT).setToken("NzQxOTE1NjM0OTA4MjY2NTI2.Xy-gxw.4cPdIA8OZyGaeh-6Cnr9ODkzJdI").setActivity(Activity.playing("Cooking Lo Mei......")).build();
         jda.addEventListener(new Events());
+    }
+    public static String unicodeToUtf8 (String s) throws UnsupportedEncodingException {
+        return new String( s.getBytes("utf-8") , "utf-8");
+    }
+    public static String Utf8toGBK (String s) throws UnsupportedEncodingException {
+        return new String( s.getBytes("GBK") , "GBK");
     }
 }
