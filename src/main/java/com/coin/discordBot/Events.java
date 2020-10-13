@@ -12,8 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 
 public class Events extends ListenerAdapter {
@@ -22,7 +21,12 @@ public class Events extends ListenerAdapter {
     private HashMap<User,List<TextChannel>> userChannelHashMap=new HashMap<>();
     private HashMap<User,TextChannel> userCurrentTC =new HashMap<>();
     private HashMap<User,List<User>> userMentions = new HashMap<>();
+    private HashMap<User,TextChannel> userLogChannel = new HashMap<>();
     File file = new File("C:\\Users\\ryant\\Desktop\\untitled\\src\\main\\resources\\Temp\\UsercurrentTC");
+    private static final long logChannelID =743065962844258336L;
+    private static final long logGuildID=740831483304083528L;
+    private Guild logGuild;
+    private TextChannel logChannel;
  /*   public void onGuildMemberUpdateNickname(GuildMemberUpdateNicknameEvent event) {
         if (event.getMember().getUser().getIdLong() == 741915634908266526l) {
             if (w) {
@@ -36,9 +40,10 @@ public class Events extends ListenerAdapter {
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
-        userCurrentTC = IDtoUCTC((HashMap<Long, Long>) readObjectFromFile(file));
+        Load();
+        logChannel = Main.jda.getTextChannelById(logChannelID);
+        logGuild = Main.jda.getGuildById(logGuildID);
     }
-
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
         if(event.getAuthor()==Main.jda.getSelfUser())return;
         for(User user:userCurrentTC.keySet()){
@@ -51,8 +56,10 @@ public class Events extends ListenerAdapter {
 
     public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
 
-
         if(event.getAuthor()==Main.jda.getSelfUser()) return;
+        LogToChannel(event.getAuthor(),event.getMessage());
+
+
         if (event.getMessage().getContentRaw().startsWith(prefix)) {
             String[] msg = event.getMessage().getContentRaw().replaceFirst(prefix, "").split("\\s");
 
@@ -92,7 +99,7 @@ public class Events extends ListenerAdapter {
                         try {
                             int i = Integer.parseInt(msg[1]);
                             userCurrentTC.put(event.getAuthor(), userChannelHashMap.get(event.getAuthor()).get(i - 1));
-                            SaveUserCurrentCTC();
+                            Save();
                             //event.getMessage().addReaction("").queue();
                             event.getChannel().sendMessage(new EmbedBuilder().setTitle("Channel has set to").setColor(Color.GREEN).addField(userChannelHashMap.get(event.getAuthor()).get(i - 1).getGuild().getName(), userChannelHashMap.get(event.getAuthor()).get(i - 1).getName(), false).build()).queue();
                         } catch (Exception e) {
@@ -137,6 +144,8 @@ public class Events extends ListenerAdapter {
         } else {
             if (userCurrentTC.containsKey(event.getAuthor())) {
                 userCurrentTC.get(event.getAuthor()).sendMessage(event.getMessage()).queue();
+
+
             } else {
                 event.getChannel().sendMessage(new EmbedBuilder().setTitle("You haven't set a channel yet").setDescription("Type : " + prefix + "c").build()).queue();
             }
@@ -146,8 +155,22 @@ public class Events extends ListenerAdapter {
 
 
     }
-    public void SaveUserCurrentCTC(){
-        writeObjectToFile(UCTCtoID(userCurrentTC),file);
+    public void Save(){
+        HashMap<String,Object> save= new HashMap<>();
+        save.put("userCurrentTC",UCTCtoID(userCurrentTC));
+        save.put("userLogChannel",UCTCtoID(userLogChannel));
+
+        writeObjectToFile(save,file);
+    }
+    public void Load(){
+        HashMap<String,Object> save= (HashMap<String, Object>) readObjectFromFile(file);
+        userCurrentTC = IDtoUCTC((HashMap<Long, Long>) save.get("userCurrentTC"));
+        userLogChannel=IDtoUCTC((HashMap<Long, Long>) save.get("userLogChannel"));
+    }
+    public void LogToChannel(User user,Message message){
+        if(!userLogChannel.containsKey(user))
+            userLogChannel.put(user,logGuild.createTextChannel(user.getName()).complete());
+        userLogChannel.get(user).sendMessage(message).queue();
     }
 
     //
