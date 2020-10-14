@@ -36,7 +36,7 @@ public class Main {
         jda.addEventListener(new Events());
     }
     public static String unicodeToUtf8 (String s) throws UnsupportedEncodingException {
-        return new String( s.getBytes("utf-8") , "utf-8");
+        return new String( s.getBytes(StandardCharsets.UTF_8) , StandardCharsets.UTF_8);
     }
     public static String Utf8toGBK (String s) throws UnsupportedEncodingException {
         return new String( s.getBytes("GBK") , "GBK");

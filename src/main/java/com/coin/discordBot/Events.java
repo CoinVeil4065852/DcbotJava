@@ -11,22 +11,23 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
 
 public class Events extends ListenerAdapter {
-    private String prefix = "-";
-    private boolean w = true;
-    private HashMap<User, List<TextChannel>> userChannelHashMap = new HashMap<>();
+    private final String prefix = "-";
+    private final boolean w = true;
+    private final HashMap<User, List<TextChannel>> userChannelHashMap = new HashMap<>();
     private HashMap<User, TextChannel> userCurrentTC = new HashMap<>();
-    private HashMap<User, List<User>> userMentions = new HashMap<>();
+    private final HashMap<User, List<User>> userMentions = new HashMap<>();
     private HashMap<User, TextChannel> userLogChannel = new HashMap<>();
     File file = new File("C:\\Users\\ryant\\Desktop\\untitled\\src\\main\\resources\\Temp\\UsercurrentTC");
     private static final long logChannelID = 765520394949361674L;
     private static final long logGuildID = 740831483304083528L;
     private Guild logGuild;
     private TextChannel logChannel;
-    private Set<String> keyWords = new HashSet<>();
+    private final Set<String> keyWords = new HashSet<>();
 
 
     @Override
@@ -63,8 +64,9 @@ public class Events extends ListenerAdapter {
         }
         //Math
         try {
-            String temp =Double.toString(Math(event.getMessage().getContentRaw()));
-            event.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle(event.getMessage().getContentRaw()+"=").setDescription(temp).build()).queue();
+            String message =event.getMessage().getContentRaw().replaceAll("\\s+","").replaceAll("=","");
+            String temp =Double.toString(Math(message));
+            event.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle(message+"=").setDescription(temp).build()).queue();
         }catch (Exception e){ }
     }
 
@@ -332,7 +334,7 @@ public class Events extends ListenerAdapter {
 
     public static String GBKToUtf8(String s) {
         try {
-            return new String(s.getBytes("GBK"), "utf-8");
+            return new String(s.getBytes("GBK"), StandardCharsets.UTF_8);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -342,14 +344,15 @@ public class Events extends ListenerAdapter {
 
     public static String Utf8ToGBK(String s) {
         try {
-            return new String(s.getBytes("utf-8"), "GBK");
+            return new String(s.getBytes(StandardCharsets.UTF_8), "GBK");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return null;
         }
     }
     public double Math(String message) throws Exception {
-        String messageArgs[]= message.split("");
+        String[] messageArgs = message.split("");
+
         List<String> mathArgs = new ArrayList<>();
         String number="";
         for (String arg : messageArgs) {
@@ -367,6 +370,7 @@ public class Events extends ListenerAdapter {
     }
     public double MathHandler(List<String> mathArgs) throws Exception{
         double ans = 0;
+        System.out.println(mathArgs);
         //( )
         for (int i = 0; i <mathArgs.size() ; i++) {
             String arg = mathArgs.get(i);
@@ -384,11 +388,24 @@ public class Events extends ListenerAdapter {
                 }
             }
         }
+        // ^
+        for (int i = 1; i < mathArgs.size()-1; i++) {
+
+            String arg = mathArgs.get(i);
+            if(arg.equals("^")){
+                double a = Double.parseDouble(mathArgs.get(i-1));
+                double b = Double.parseDouble(mathArgs.get(i+1));
+                mathArgs.subList(i-1,i+2).clear();
+                    mathArgs.add(i-1,Double.toString(Math.pow(a,b)));
+                i--;
+                System.out.println(mathArgs);
+            }
+        }
         //* /
         for (int i = 1; i < mathArgs.size()-1; i++) {
 
             String arg = mathArgs.get(i);
-            if(arg.equals("*")||arg.equals("/")){
+            if(arg.equals("*")||arg.equals("/")||arg.equals("¡Â")){
                 double a = Double.parseDouble(mathArgs.get(i-1));
                 double b = Double.parseDouble(mathArgs.get(i+1));
                 mathArgs.subList(i-1,i+2).clear();
@@ -418,6 +435,7 @@ public class Events extends ListenerAdapter {
             }
         }
         System.out.println("finish"+mathArgs.get(0));
-        return Double.parseDouble(mathArgs.get(0)) ;
+        if(mathArgs.size()!=1) throw new Exception();
+        return Double.parseDouble(mathArgs.get(0));
     }
 }
