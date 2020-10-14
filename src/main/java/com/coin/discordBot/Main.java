@@ -32,30 +32,6 @@ public class Main {
         jPanel.add(jLabel);
 
 
-        System.out.println();
-        String[] ws= "你好我是中文".split("");
-        System.out.println(ws.toString());
-        String ww = "";
-        for (String w : ws){
-             ww=ww+w;
-            System.out.println(w);
-        }
-        System.out.println(ww);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //
         jda = new JDABuilder(AccountType.BOT).setToken("NzQxOTE1NjM0OTA4MjY2NTI2.Xy-gxw.4cPdIA8OZyGaeh-6Cnr9ODkzJdI").setActivity(Activity.playing("Cooking Lo Mei......")).build();
         jda.addEventListener(new Events());
     }

@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.List;
 
@@ -33,21 +32,23 @@ public class Events extends ListenerAdapter {
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         keyWords.add("Í≈…˝");
-        keyWords.add("ú´Í≈…˝");
+        keyWords.add("ú´Í≈");
         keyWords.add("ryan");
         keyWords.add("¿œπ´");
         keyWords.add("¿œ∆≈");
         keyWords.add("œ≤ög");
-        keyWords.add("Ã∆æc");
+
         keyWords.add("–°…˝…˝");
         keyWords.add("”Hê€");
         keyWords.add("90611");
-        keyWords.add("90631");
+        keyWords.add("∞¢ú´");
 
 
         Load();
         logChannel = Main.jda.getTextChannelById(logChannelID);
         logGuild = Main.jda.getGuildById(logGuildID);
+
+
 
 
     }
@@ -60,6 +61,11 @@ public class Events extends ListenerAdapter {
                         channel.sendMessage(new EmbedBuilder().setTitle(event.getMember().getNickname()).setDescription(event.getMessage().getContentRaw()).build()).queue());
             }
         }
+        //Math
+        try {
+            String temp =Double.toString(Math(event.getMessage().getContentRaw()));
+            event.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle(event.getMessage().getContentRaw()+"=").setDescription(temp).build()).queue();
+        }catch (Exception e){ }
     }
 
     public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
@@ -274,6 +280,7 @@ public class Events extends ListenerAdapter {
         messages.add(0, message);
         Collections.reverse(messages);
         Set<Message> messageToDelete = new HashSet<>();
+        Message deleteMessage=null;
         String usersendkeyword = "";
         boolean delete = false;
         for (String keyword : keyWords) {
@@ -285,8 +292,10 @@ public class Events extends ListenerAdapter {
                 for (String s : messageSplit) {
                     if (keywordSplit[keywordIndex].equalsIgnoreCase(s)) {
                         allMessage = allMessage + s;
-                        if (m.getAuthor() == Main.jda.getSelfUser())
+                        if (m.getAuthor() == Main.jda.getSelfUser()) {
                             messageToDelete.add(m);
+                            deleteMessage=m;
+                        }
                         keywordIndex++;
                         if (keywordIndex > keywordSplit.length - 1)
                             keywordIndex = 0;
@@ -301,12 +310,17 @@ public class Events extends ListenerAdapter {
         }
 
 
-        boolean canSend = !delete || !messageToDelete.remove(message);
+        boolean canSend = !delete || messageToDelete.remove(message);
         System.out.println(canSend);
         if (delete) {
             System.out.println("delete");
+
             try {
-                channel.deleteMessages(messageToDelete).queue();
+                if(messageToDelete.size()>1){
+                    channel.deleteMessages(messageToDelete).queue();
+                }else {
+                    channel.deleteMessageById(deleteMessage.getIdLong()).queue();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -333,5 +347,77 @@ public class Events extends ListenerAdapter {
             e.printStackTrace();
             return null;
         }
+    }
+    public double Math(String message) throws Exception {
+        String messageArgs[]= message.split("");
+        List<String> mathArgs = new ArrayList<>();
+        String number="";
+        for (String arg : messageArgs) {
+            try{
+                Double.parseDouble(arg);
+                number=number+arg;
+            }catch (Exception e){
+                if(!number.isEmpty())mathArgs.add(number);
+                number="";
+                mathArgs.add(arg);
+            }
+        }
+        if(!number.isEmpty())mathArgs.add(number);
+        return (MathHandler(mathArgs));
+    }
+    public double MathHandler(List<String> mathArgs) throws Exception{
+        double ans = 0;
+        //( )
+        for (int i = 0; i <mathArgs.size() ; i++) {
+            String arg = mathArgs.get(i);
+            if(arg.equals("(")){
+                for (int j = mathArgs.size()-1; j >=0 ; j--) {
+
+                    if(mathArgs.get(j).equals(")")) {
+
+                        MathHandler(mathArgs.subList(i + 1, j));
+                        mathArgs.remove(i);
+                        mathArgs.remove(i+1);
+                        break;
+
+                    }
+                }
+            }
+        }
+        //* /
+        for (int i = 1; i < mathArgs.size()-1; i++) {
+
+            String arg = mathArgs.get(i);
+            if(arg.equals("*")||arg.equals("/")){
+                double a = Double.parseDouble(mathArgs.get(i-1));
+                double b = Double.parseDouble(mathArgs.get(i+1));
+                mathArgs.subList(i-1,i+2).clear();
+                if (arg.equals("*"))
+                    mathArgs.add(i-1,Double.toString(a*b));
+                else
+                    mathArgs.add(i-1,Double.toString(a/b));
+                i--;
+
+                System.out.println(mathArgs);
+            }
+        }
+        for (int i = 1; i < mathArgs.size()-1; i++) {
+
+            String arg = mathArgs.get(i);
+            if(arg.equals("+")||arg.equals("-")){
+                double a = Double.parseDouble(mathArgs.get(i-1));
+                double b = Double.parseDouble(mathArgs.get(i+1));
+                mathArgs.subList(i-1,i+2).clear();
+                if (arg.equals("+"))
+                    mathArgs.add(i-1,Double.toString(a+b));
+                else
+                    mathArgs.add(i-1,Double.toString(a-b));
+                i--;
+
+                System.out.println(mathArgs);
+            }
+        }
+        System.out.println("finish"+mathArgs.get(0));
+        return Double.parseDouble(mathArgs.get(0)) ;
     }
 }
