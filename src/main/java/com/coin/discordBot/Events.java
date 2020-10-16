@@ -17,7 +17,6 @@ import java.util.List;
 
 public class Events extends ListenerAdapter {
     private final String prefix = "-";
-    private final boolean w = true;
     private final HashMap<User, List<TextChannel>> userChannelHashMap = new HashMap<>();
     private HashMap<User, TextChannel> userCurrentTC = new HashMap<>();
     private final HashMap<User, List<User>> userMentions = new HashMap<>();
@@ -29,7 +28,6 @@ public class Events extends ListenerAdapter {
     private TextChannel logChannel;
     private final Set<String> keyWords = new HashSet<>();
 
-
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         keyWords.add("昱升");
@@ -38,7 +36,6 @@ public class Events extends ListenerAdapter {
         keyWords.add("老公");
         keyWords.add("老婆");
         keyWords.add("喜歡");
-
         keyWords.add("小升升");
         keyWords.add("親愛");
         keyWords.add("90611");
@@ -59,7 +56,7 @@ public class Events extends ListenerAdapter {
         for (User user : userCurrentTC.keySet()) {
             if (userCurrentTC.get(user) == event.getChannel()) {
                 user.openPrivateChannel().queue(channel ->
-                        channel.sendMessage(new EmbedBuilder().setTitle(event.getMember().getNickname()).setDescription(event.getMessage().getContentRaw()).build()).queue());
+                        channel.sendMessage(new EmbedBuilder().setTitle(Objects.requireNonNull(event.getMember()).getNickname()).setDescription(event.getMessage().getContentRaw()).build()).queue());
             }
         }
         //Math
@@ -67,7 +64,7 @@ public class Events extends ListenerAdapter {
             String message =event.getMessage().getContentRaw().replaceAll("\\s+","").replaceAll("=","");
             String temp =Double.toString(Math(message));
             event.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle(message+"=").setDescription(temp).build()).queue();
-        }catch (Exception e){ }
+        }catch (Exception ignored){ }
     }
 
     public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
@@ -283,17 +280,17 @@ public class Events extends ListenerAdapter {
         Collections.reverse(messages);
         Set<Message> messageToDelete = new HashSet<>();
         Message deleteMessage=null;
-        String usersendkeyword = "";
+        StringBuilder usersendkeyword = new StringBuilder();
         boolean delete = false;
         for (String keyword : keyWords) {
-            String allMessage = "";
+            StringBuilder allMessage = new StringBuilder();
             String[] keywordSplit = keyword.split("");
             int keywordIndex = 0;
             for (Message m : messages) {///
                 String[] messageSplit = m.getContentRaw().split("");
                 for (String s : messageSplit) {
                     if (keywordSplit[keywordIndex].equalsIgnoreCase(s)) {
-                        allMessage = allMessage + s;
+                        allMessage.append(s);
                         if (m.getAuthor() == Main.jda.getSelfUser()) {
                             messageToDelete.add(m);
                             deleteMessage=m;
@@ -305,9 +302,9 @@ public class Events extends ListenerAdapter {
                 }
             }
             System.out.println(allMessage);
-            if (allMessage.contains(keyword)) {
+            if (allMessage.toString().contains(keyword)) {
                 delete = true;
-                usersendkeyword = usersendkeyword + keyword + "\n";
+                usersendkeyword.append(keyword).append("\n");
             }
         }
 
@@ -328,7 +325,7 @@ public class Events extends ListenerAdapter {
             }
         }
         if (!canSend)
-            message.getChannel().sendMessage(new EmbedBuilder().setTitle("請不要輸入以下關鍵字").setDescription(usersendkeyword).setColor(Color.RED).build()).queue();
+            message.getChannel().sendMessage(new EmbedBuilder().setTitle("請不要輸入以下關鍵字").setDescription(usersendkeyword.toString()).setColor(Color.RED).build()).queue();
         return canSend;
     }
 
@@ -360,30 +357,37 @@ public class Events extends ListenerAdapter {
                 Double.parseDouble(arg);
                 number=number+arg;
             }catch (Exception e){
-                if(!number.isEmpty())mathArgs.add(number);
-                number="";
-                mathArgs.add(arg);
+                if(arg.equals("."))number=number+arg;
+                else {
+                    if (!number.isEmpty()) mathArgs.add(number);
+                    number = "";
+                    mathArgs.add(arg);
+                }
             }
         }
         if(!number.isEmpty())mathArgs.add(number);
         return (MathHandler(mathArgs));
     }
     public double MathHandler(List<String> mathArgs) throws Exception{
+        if(mathArgs.size()<2) throw new Exception();
         double ans = 0;
         System.out.println(mathArgs);
         //( )
         for (int i = 0; i <mathArgs.size() ; i++) {
             String arg = mathArgs.get(i);
             if(arg.equals("(")){
-                for (int j = mathArgs.size()-1; j >=0 ; j--) {
-
+                int bracketsCount = 0;
+                for (int j =i+1; j <mathArgs.size() ; j++) {
+                    if(mathArgs.get(j).equals("("))
+                        bracketsCount++;
                     if(mathArgs.get(j).equals(")")) {
-
-                        MathHandler(mathArgs.subList(i + 1, j));
-                        mathArgs.remove(i);
-                        mathArgs.remove(i+1);
-                        break;
-
+                        if(bracketsCount==0) {
+                            MathHandler(mathArgs.subList(i + 1, j));
+                            mathArgs.remove(i);
+                            mathArgs.remove(i + 1);
+                            break;
+                        }
+                        bracketsCount--;
                     }
                 }
             }
@@ -405,11 +409,11 @@ public class Events extends ListenerAdapter {
         for (int i = 1; i < mathArgs.size()-1; i++) {
 
             String arg = mathArgs.get(i);
-            if(arg.equals("*")||arg.equals("/")||arg.equals("÷")){
+            if(arg.equals("*")||arg.equals("x")||arg.equals("/")||arg.equals("÷")){
                 double a = Double.parseDouble(mathArgs.get(i-1));
                 double b = Double.parseDouble(mathArgs.get(i+1));
                 mathArgs.subList(i-1,i+2).clear();
-                if (arg.equals("*"))
+                if (arg.equals("*")||arg.equals("x"))
                     mathArgs.add(i-1,Double.toString(a*b));
                 else
                     mathArgs.add(i-1,Double.toString(a/b));
