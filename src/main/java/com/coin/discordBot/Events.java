@@ -1,14 +1,20 @@
 package com.coin.discordBot;
 
 
+import com.coin.discordBot.commands.Command;
+import com.coin.discordBot.commands.Nim;
+import com.coin.discordBot.commands.Ping;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+import javax.xml.crypto.dsig.CanonicalizationMethod;
 import java.awt.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -21,26 +27,33 @@ public class Events extends ListenerAdapter {
     private HashMap<User, TextChannel> userCurrentTC = new HashMap<>();
     private final HashMap<User, List<User>> userMentions = new HashMap<>();
     private HashMap<User, TextChannel> userLogChannel = new HashMap<>();
+    private Category botCategory;
+    private HashSet<Command> commands= new HashSet<>();
+
     File file = new File("C:\\Users\\ryant\\Desktop\\untitled\\src\\main\\resources\\Temp\\UsercurrentTC");
-    private static final long logChannelID = 765520394949361674L;
-    private static final long logGuildID = 740831483304083528L;
+    private static final long logChannelID = 767292905194258463L;
+    private static final long logGuildID = 767236392077623298L;
     private Guild logGuild;
     private TextChannel logChannel;
     private final Set<String> keyWords = new HashSet<>();
 
+    //NimGame
+    private HashMap<Member,NimGame> userGames = new HashMap<>();
+
     @Override
     public void onReady(@NotNull ReadyEvent event) {
-        keyWords.add("Í≈…˝");
-        keyWords.add("ú´Í≈");
+        keyWords.add("\u6631\u5347");
+        keyWords.add("\u6E6F\u6631");
         keyWords.add("ryan");
-        keyWords.add("¿œπ´");
-        keyWords.add("¿œ∆≈");
-        keyWords.add("œ≤ög");
-        keyWords.add("–°…˝…˝");
-        keyWords.add("”Hê€");
+        keyWords.add("\u8001\u516C");
+        keyWords.add("\u8001\u5A46");
+        keyWords.add("\u559C\u6B61");
+        keyWords.add("\u5C0F\u5347\u5347");
+        keyWords.add("\u89AA\u611B");
         keyWords.add("90611");
-        keyWords.add("∞¢ú´");
-
+        keyWords.add("\u963F\u6E6F");
+        commands.add(new Nim());
+        commands.add(new Ping());
 
         Load();
         logChannel = Main.jda.getTextChannelById(logChannelID);
@@ -49,6 +62,64 @@ public class Events extends ListenerAdapter {
 
 
 
+
+    }
+
+    @Override
+    public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
+        if(event.getMember()==Main.jda.getSelfUser())return;
+        if(userGames.containsKey(event.getMember())){
+            NimGame game=userGames.get(event.getMember());
+            if(event.getMessageIdLong()==game.tempMessage.getIdLong()) {
+                try {
+                    game.UserTurn(Integer.parseInt(event.getReaction().getReactionEmote().getAsReactionCode().replace("\uFE0F\u20E3", "")));
+                    event.getChannel().deleteMessageById(game.tempMessage.getIdLong()).queue();
+                    if(game.CheckLose()){
+                        event.getChannel().sendMessage(new EmbedBuilder().setTitle(event.getMember().getNickname()).setDescription("YOU LOSE").setColor(Color.RED).build()).queue();
+                        userGames.remove(event.getMember());
+                        return;
+                    }
+
+                    StringBuilder temp = new StringBuilder();
+                    for (int i = 0; i < userGames.get(event.getMember()).GetNimCount(); i++) {
+                        temp.append("\uD83D\uDFE5");
+                        if(i%5==4){
+                            temp.append("\n");
+                        }
+                    }
+                    int tempCount =game.GetNimCount();
+                    game.ComputerTurn();
+                    if(game.CheckLose()){
+                        event.getChannel().sendMessage(new EmbedBuilder().setTitle(event.getMember().getNickname()).setDescription("YOU WIN").setColor(Color.GREEN).build()).queue();
+                        userGames.remove(event.getMember());
+                        return;
+                    }
+                    StringBuilder temp2 = new StringBuilder();
+                    int j = 0;
+                    for (int i = 0; i < userGames.get(event.getMember()).GetNimCount(); i++) {
+                        temp2.append("\uD83D\uDFE5");
+                        if(i%5==4){
+                            temp2.append("\n");
+                        }
+                        j=i+1;
+                    }
+                    for (int i = j; i < tempCount-game.GetNimCount()+j; i++) {
+                        temp2.append("\uD83D\uDD33");
+                        System.out.println(temp2.length());
+                        if(i%5==4){
+                            temp2.append("\n");
+                        }
+                    }
+                    userGames.get(event.getMember()).tempMessage= event.getChannel().sendMessage(
+                            new EmbedBuilder().setTitle(event.getMember().getNickname()).addField("Your turn : "+event.getReaction().getReactionEmote().getAsReactionCode().replace("\uFE0F\u20E3", ""), temp.toString(),false).addField("Computer's turn : "+Integer.toString(tempCount-game.GetNimCount()), temp2.toString(),false).build()).complete();
+                    for (int i = 1; i <= 5; i++) {
+                        userGames.get(event.getMember()).tempMessage.addReaction(i+"\uFE0F\u20E3").queue();
+                    }
+
+                } catch (Exception e) {
+                }
+            }
+        }
     }
 
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
@@ -65,13 +136,29 @@ public class Events extends ListenerAdapter {
             String temp =Double.toString(Math(message));
             event.getChannel().sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle(message+"=").setDescription(temp).build()).queue();
         }catch (Exception ignored){ }
+        //commands
+
+    }
+
+    @Override
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        boolean isGuild = event.isFromGuild();
+        if(event.getMessage().getContentRaw().toLowerCase().startsWith(prefix)) {
+            String msg[] = event.getMessage().getContentRaw().replaceFirst(prefix,"").toLowerCase().split("\\s");
+            for (Command command: commands) {
+                if(msg[0].equals(command.NAME) &&((isGuild&&command.CAN_CALL_IN_GUILD)||(!isGuild&&command.CAN_CALL_IN_PRIVATE))){
+                    command.execute(event);
+                }
+            }
+
+        }
     }
 
     public void onPrivateMessageReceived(PrivateMessageReceivedEvent event) {
         System.out.println(Utf8ToGBK(event.getMessage().getContentRaw()));
 
 
-
+        if (botCategory==null) botCategory = logGuild.createCategory(Main.jda.getSelfUser().getName()).complete();
         if (event.getAuthor() == Main.jda.getSelfUser()) return;
         LogToChannel(event.getAuthor(), event.getMessage());
         Save();
@@ -175,6 +262,7 @@ public class Events extends ListenerAdapter {
         HashMap<String, Object> save = new HashMap<>();
         save.put("userCurrentTC", UCTCtoID(userCurrentTC));
         save.put("userLogChannel", UCTCtoID(userLogChannel));
+        save.put("botCategory", botCategory.getIdLong());
 
         writeObjectToFile(save, file);
     }
@@ -184,6 +272,8 @@ public class Events extends ListenerAdapter {
         try {
             userCurrentTC = IDtoUCTC((HashMap<Long, Long>) save.get("userCurrentTC"));
             userLogChannel = IDtoUCTC((HashMap<Long, Long>) save.get("userLogChannel"));
+            botCategory = Main.jda.getCategoryById((Long) save.get("botCategory"));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -192,7 +282,7 @@ public class Events extends ListenerAdapter {
 
     public void LogToChannel(User user, Message message) {
         if (!userLogChannel.containsKey(user))
-            userLogChannel.put(user, logGuild.createTextChannel(user.getName()).complete());
+            userLogChannel.put(user, botCategory.createTextChannel(user.getName()).complete());
         userLogChannel.get(user).sendMessage(message).queue();
         logChannel.sendMessage(userLogChannel.get(user).getAsMention() + ":" + message.getContentRaw()).queue();
     }
@@ -238,7 +328,7 @@ public class Events extends ListenerAdapter {
         }
         return uCID;
     }
-//
+
 
 
     public static void writeObjectToFile(Object obj, File file) {
@@ -442,4 +532,5 @@ public class Events extends ListenerAdapter {
         if(mathArgs.size()!=1) throw new Exception();
         return Double.parseDouble(mathArgs.get(0));
     }
+
 }

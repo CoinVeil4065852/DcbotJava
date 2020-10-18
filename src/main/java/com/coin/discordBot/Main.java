@@ -1,5 +1,6 @@
 package com.coin.discordBot;
 
+import com.coin.discordBot.Excepions.NumberOutOfRangeException;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -8,15 +9,34 @@ import net.dv8tion.jda.api.entities.Activity;
 import javax.security.auth.login.LoginException;
 import javax.swing.*;
 import java.io.UnsupportedEncodingException;
+import java.net.NetworkInterface;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Scanner;
 import java.util.jar.JarEntry;
 
 public class Main {
     public static JDA jda;
-    public static void main (String[] agrs) throws LoginException, UnsupportedEncodingException {
+    public static void main (String[] agrs) throws Exception {
+
+        NimGame nimGame = new NimGame();
+        Scanner scanner = new Scanner(System.in);
+/*
+        while (!nimGame.CheckLose()){
+            try {
+                nimGame.UserTurn(Integer.parseInt(scanner.next()));
+            }catch (NumberOutOfRangeException e){
+                System.out.println("enter a number between"+"1 to "+Integer.toString(5));
+            }catch (NumberFormatException e){
+                System.out.println(e.toString());
+            }
+        }
+*/
+
+
+
         //
-        JPanel jPanel = new JPanel();
+/*        JPanel jPanel = new JPanel();
         JFrame jFrame = new JFrame();
 
         jFrame.setSize(800,600);
@@ -29,7 +49,7 @@ public class Main {
 
         JLabel jLabel = new JLabel();
         jLabel.setBounds(10,20,80,25);
-        jPanel.add(jLabel);
+        jPanel.add(jLabel);*/
 
 
         jda = new JDABuilder(AccountType.BOT).setToken("NzQxOTE1NjM0OTA4MjY2NTI2.Xy-gxw.4cPdIA8OZyGaeh-6Cnr9ODkzJdI").setActivity(Activity.playing("Cooking Lo Mei......")).build();
