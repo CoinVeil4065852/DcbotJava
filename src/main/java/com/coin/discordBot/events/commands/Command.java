@@ -1,9 +1,13 @@
-package com.coin.discordBot.commands;
+package com.coin.discordBot.events.commands;
 
+import com.coin.discordBot.Main;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
-public abstract class Command {
+public class Command {
     public final String NAME;
     public final String DESCRIPTION;
     public final boolean CAN_CALL_IN_GUILD;
@@ -17,5 +21,6 @@ public abstract class Command {
         CAN_CALL_IN_GUILD = can_call_in_guild;
         CAN_CALL_IN_PRIVATE = can_call_in_private;
     }
-    public abstract void execute(MessageReceivedEvent event);
+
+    public void execute(MessageReceivedEvent event,String[] args) { }
 }

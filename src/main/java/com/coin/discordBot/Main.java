@@ -1,41 +1,23 @@
 package com.coin.discordBot;
 
-import com.coin.discordBot.Excepions.NumberOutOfRangeException;
+import com.coin.discordBot.events.Events;
+import com.coin.discordBot.events.features.Arithmetic;
+import com.coin.discordBot.events.features.Nim;
+import com.coin.discordBot.events.features.Resend;
+import com.coin.discordBot.readAndWrite.Save;
 import net.dv8tion.jda.api.AccountType;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 
-import javax.security.auth.login.LoginException;
-import javax.swing.*;
 import java.io.UnsupportedEncodingException;
-import java.net.NetworkInterface;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Scanner;
-import java.util.jar.JarEntry;
 
 public class Main {
     public static JDA jda;
     public static void main (String[] agrs) throws Exception {
+        Save.readAll();
 
-        NimGame nimGame = new NimGame();
-        Scanner scanner = new Scanner(System.in);
-/*
-        while (!nimGame.CheckLose()){
-            try {
-                nimGame.UserTurn(Integer.parseInt(scanner.next()));
-            }catch (NumberOutOfRangeException e){
-                System.out.println("enter a number between"+"1 to "+Integer.toString(5));
-            }catch (NumberFormatException e){
-                System.out.println(e.toString());
-            }
-        }
-*/
-
-
-
-        //
 /*        JPanel jPanel = new JPanel();
         JFrame jFrame = new JFrame();
 
@@ -54,6 +36,10 @@ public class Main {
 
         jda = new JDABuilder(AccountType.BOT).setToken("NzQxOTE1NjM0OTA4MjY2NTI2.Xy-gxw.4cPdIA8OZyGaeh-6Cnr9ODkzJdI").setActivity(Activity.playing("Cooking Lo Mei......")).build();
         jda.addEventListener(new Events());
+        jda.addEventListener(new Arithmetic());
+        jda.addEventListener(new Resend());
+        jda.addEventListener(new Nim());
+
     }
     public static String unicodeToUtf8 (String s) throws UnsupportedEncodingException {
         return new String( s.getBytes(StandardCharsets.UTF_8) , StandardCharsets.UTF_8);
