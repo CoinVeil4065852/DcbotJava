@@ -1,11 +1,10 @@
 package com.coin.discordBot.events.features;
 
-import com.coin.discordBot.events.Events;
 import com.coin.discordBot.Main;
+import com.coin.discordBot.events.Events;
 import com.coin.discordBot.readAndWrite.Save;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;

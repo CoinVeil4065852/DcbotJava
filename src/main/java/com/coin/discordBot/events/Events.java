@@ -2,8 +2,6 @@ package com.coin.discordBot.events;
 
 
 import com.coin.discordBot.events.commands.*;
-import com.coin.discordBot.events.features.Resend;
-import com.coin.discordBot.readAndWrite.Save;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;

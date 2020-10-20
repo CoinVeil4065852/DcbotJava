@@ -1,11 +1,7 @@
 package com.coin.discordBot.events.commands;
 
-import com.coin.discordBot.Main;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
 
 public class Command {
     public final String NAME;
@@ -22,5 +18,6 @@ public class Command {
         CAN_CALL_IN_PRIVATE = can_call_in_private;
     }
 
-    public void execute(MessageReceivedEvent event,String[] args) { }
+    public void execute(MessageReceivedEvent event, String[] args) {
+    }
 }

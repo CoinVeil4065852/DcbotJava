@@ -2,7 +2,7 @@ package com.coin.discordBot.events.features;
 
 import com.coin.discordBot.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,9 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Arithmetic extends ListenerAdapter {
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         if (event.getAuthor() == Main.jda.getSelfUser()) return;
-        //Math
         try {
             String message =event.getMessage().getContentRaw().replaceAll("\\s+","").replaceAll("=","");
             String temp =Double.toString(Math(message));
@@ -22,8 +21,7 @@ public class Arithmetic extends ListenerAdapter {
     }
     public double Math(String message) throws Exception {
         String[] messageArgs = message.split("");
-
-        java.util.List<String> mathArgs = new ArrayList<>();
+        List<String> mathArgs = new ArrayList<>();
         String number="";
         for (String arg : messageArgs) {
             try{

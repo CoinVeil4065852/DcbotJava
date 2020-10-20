@@ -1,14 +1,13 @@
 package com.coin.discordBot.events.commands;
 
 import com.coin.discordBot.events.Events;
-import com.coin.discordBot.Main;
 import com.coin.discordBot.events.features.Resend;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

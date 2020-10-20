@@ -1,40 +1,24 @@
 package com.coin.discordBot;
 
 import com.coin.discordBot.Excepions.NumberOutOfRangeException;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
 
-import java.math.MathContext;
-import java.sql.ShardingKey;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Random;
 
 public class NimGame{
-   /* private final Member member;
-    private final TextChannel textChannel;*/
+
 
     private int nimCount;
     private int max;
     public Message tempMessage;
     boolean hard;
 
-    public NimGame(boolean hard/*Member member,TextChannel textChannel*/){
-       /* this.member =member;
-        this.textChannel =textChannel;*/
+    public NimGame(boolean hard){
         this.hard  =hard;
         nimCount=25;
         max = 5;
     }
-    public NimGame(/*Member member,TextChannel textChannel*/){
-       /* this.member =member;
-        this.textChannel =textChannel;*/
+    public NimGame(){
         this.hard  =false;
         nimCount=25;
         max = 5;
